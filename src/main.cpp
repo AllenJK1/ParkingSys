@@ -1,7 +1,9 @@
 #include "../include/main.hpp"
 #include "../include/window_mgmt.hpp"
+#include "../include/structures.hpp"
 int main(int argc, char *argv[])
 {
+/*
     QApplication app(argc, argv);
     QWidget window;
     window.setWindowTitle("Parking Sys");
@@ -24,8 +26,14 @@ int main(int argc, char *argv[])
                      });
     QObject::connect(quitButton, &QPushButton::clicked, &app, &QCoreApplication::quit);
     window.show();
+*/
+    Structures structures;
+    std::string Fname("Allen");
+    std::string Lname("Kipla");
+    std::string ID("1234");
+
+    structures.AddCustomer(Fname, Lname, ID);
     
-    
-    return app.exec();
+    return 0;
 }
 
