@@ -62,14 +62,14 @@ public:
     }
     int AddCustomer(std::string Firstname, std::string SecondName, std::string IdNum)
     {
-        this->customer[CustomerCount + 1].Id = CustomerCount + 1;
-        this->customer[CustomerCount + 1].FirstName = Firstname;
-        this->customer[CustomerCount + 1].SecondName = SecondName;
-        this->customer[CustomerCount + 1].IdNumber = IdNum;
-        this->customer[CustomerCount + 1].CheckInTime = static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::seconds>(
+        this->customer[CustomerCount].Id = CustomerCount + 1;
+        this->customer[CustomerCount].FirstName = Firstname;
+        this->customer[CustomerCount].SecondName = SecondName;
+        this->customer[CustomerCount].IdNumber = IdNum;
+        this->customer[CustomerCount].CheckInTime = static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()).count());  
         this->CustomerCount += 1;      
-        return 0;
+        return this->CustomerCount - 1;
     }
     int SelectSpace(unsigned long CustomerID_, unsigned long Floor_, unsigned long ParkingSpot)
     {

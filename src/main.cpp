@@ -1,9 +1,44 @@
 #include "../include/main.hpp"
 #include "../include/window_mgmt.hpp"
 #include "../include/structures.hpp"
+Structures structures;
+int PromptUserInfo();
+int RequestUserInfo(unsigned long ID);
 int main(int argc, char *argv[])
 {
+    unsigned long clients;
+    clients = PromptUserInfo();
+    std::cout << "\nYour Entry ID is: " << clients ;
+    clients = PromptUserInfo();
+    std::cout << "\nYour Entry ID is: " << clients ;
+    std::cout << "\n";
+    RequestUserInfo(0);
+    RequestUserInfo(1);
+    return 0;
+}
+int RequestUserInfo(unsigned long ID)
+{
+    Customer querry = structures.GetCustomer(ID);
+    std::cout << "\nFirstname: " << querry.FirstName ;
+    return 0;
+}
+int PromptUserInfo()
+{
+    std::string Fname, Lname, ID;
+    std::cout << "\nEnter Firstname: ";
+    std::cin >> Fname;
+    std::cout << "\nEnter Second name: ";
+    std::cin >> Lname;
+    std::cout << "\nEnter Id: ";
+    std::cin >> ID;
+    
+    return structures.AddCustomer(Fname, Lname, ID);
+    
+; 
+
+}
 /*
+
     QApplication app(argc, argv);
     QWidget window;
     window.setWindowTitle("Parking Sys");
@@ -26,14 +61,6 @@ int main(int argc, char *argv[])
                      });
     QObject::connect(quitButton, &QPushButton::clicked, &app, &QCoreApplication::quit);
     window.show();
-*/
-    Structures structures;
-    std::string Fname("Allen");
-    std::string Lname("Kipla");
-    std::string ID("1234");
-
-    structures.AddCustomer(Fname, Lname, ID);
-    
-    return 0;
-}
-
+ 
+ *
+ */
