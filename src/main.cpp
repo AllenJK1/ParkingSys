@@ -6,6 +6,7 @@ int PromptUserInfo();
 int RequestUserInfo(unsigned long ID);
 int main(int argc, char *argv[])
 {
+    QApplication app(argc, argv);
     unsigned long clients;
     clients = PromptUserInfo();
     std::cout << "\nYour Entry ID is: " << clients ;
@@ -14,7 +15,9 @@ int main(int argc, char *argv[])
     std::cout << "\n";
     RequestUserInfo(0);
     RequestUserInfo(1);
-    return 0;
+   
+    Window_ window_("Parking SYS");
+    return app.exec();
 }
 int RequestUserInfo(unsigned long ID)
 {
