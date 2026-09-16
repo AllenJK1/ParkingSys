@@ -5,6 +5,7 @@
 #pragma once
 #include <chrono>
 #include <vector>
+#include <string>
 enum OPERATION
 {
     ADD=0,
@@ -23,7 +24,7 @@ struct Customer
 struct ParkingLot
 {
     bool occupied = false;
-    unsigned long OccupantID;
+    std::string OVehicleReg;
     
 
 };
@@ -71,19 +72,22 @@ public:
         this->CustomerCount += 1;      
         return this->CustomerCount - 1;
     }
-    int SelectSpace(unsigned long CustomerID_, unsigned long Floor_, unsigned long ParkingSpot)
+    int SelectSpace(std::string RegNo, unsigned long Floor_, unsigned long ParkingSpot)
     {
-        if (!(this->floors[Floor_ + 1].parkinglots[ParkingSpot].occupied))
+        if (Floor_ >= this->floors.size() || ParkingSpot >= 12)
         {
-            this->floors[Floor_ + 1].parkinglots[ParkingSpot].occupied = true;
-            this->floors[Floor_ + 1].parkinglots[ParkingSpot].OccupantID = CustomerID_;
-
+            return -1;
+        }
+        if (!(this->floors[Floor_].parkinglots[ParkingSpot].occupied))
+        {
+            this->floors[Floor_].parkinglots[ParkingSpot].occupied = true;
+            this->floors[Floor_].parkinglots[ParkingSpot].OVehicleReg = RegNo;
         }   
-    else if (this->floors[Floor_ + 1].parkinglots[ParkingSpot].occupied) 
-    {
-        return -1;
-    }
-    return 0;
+        else
+        {
+            return -1;
+        }
+        return 0;
     }
     Customer GetCustomer(unsigned long CustomerID_)
     {
@@ -91,6 +95,10 @@ public:
     }
     Floor GetFloors(unsigned long FloorID_)
     {
+        if (FloorID_ >= this->floors.size())
+        {
+            return Floor();
+        }
         return this->floors[FloorID_];
     }
 
