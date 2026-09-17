@@ -121,7 +121,8 @@ The resulting executable will be located at:
 ---
 
 ## Usage Guide
-
+### On lINux
+do like this
 1. **Launch the Application:**
    ```bash
    ./build/ParkingSys
@@ -143,6 +144,10 @@ The resulting executable will be located at:
    - From the main window, click the **Exit** button.
    - If vehicles are parked, choose the vehicle/spot from the list.
    - The system queries `structures.CalculateCharges()`, calculates the elapsed parking duration, displays total charges in KES, and frees the slot.
+### On windows
+build using cmake (as per the command preferrably use powershell)
+ensure to create the build folders in both root and Window
+and build Window first to avoid missing header files for the main build
 
 ---
 
@@ -177,11 +182,15 @@ Controller class managing floors, customers, space reservations, duration queryi
 
 ## Author
 
-- Name: 
-- Course / Program: 
-- Institution: 
+- Name: KIPLANGAT JETHRO
+- Course: COMPUTER SCIENCE 
+
 
 ---
+## TOOLS USED IN DEV
+
+- QT Creator to visually build the user interface and generaet the Classes for UI all in the Window FOlder
+- Developed On  linux however cross compatibilty with windows is ensured by the CMakelists.txt in the root folder and Window dir
 
 ## License
 
