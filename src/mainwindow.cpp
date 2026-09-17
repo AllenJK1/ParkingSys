@@ -1,11 +1,14 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
-#include "./ui_CustomerInfo.h"
-#include "./ui_ReserveParking.h"
+#include "ui_mainwindow.h"
+#include "ui_CustomerInfo.h"
+#include "ui_ReserveParking.h"
 #include <QDialog>
 #include <QDebug>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QStringList>
+#include <QList>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -144,7 +147,59 @@ void MainWindow::on_reserveButton_clicked()
 
 void MainWindow::on_exitButton_clicked()
 {
-    qDebug() << "Exit / Checkout clicked";
+    Floor currentFloor = structures.GetFloors(0);
+    QStringList occupiedList;
+    QList<int> spotIndices;
+
+    for (int i = 0; i < 12; ++i)
+    {
+        if (currentFloor.parkinglots[i].occupied)
+        {
+            QString reg = QString::fromStdString(currentFloor.parkinglots[i].OVehicleReg);
+            occupiedList << QString("Spot %1 - %2").arg(i + 1).arg(reg);
+            spotIndices << i;
+        }
+    }
+
+    if (occupiedList.isEmpty())
+    {
+        QMessageBox::information(this, "Exit & Checkout", "No vehicles are currently parked.");
+        return;
+    }
+
+    bool ok = false;
+    QString selectedItem = QInputDialog::getItem(
+        this,
+        "Vehicle Checkout",
+        "Select occupying vehicle to checkout:",
+        occupiedList,
+        0,
+        false,
+        &ok
+    );
+
+    if (ok && !selectedItem.isEmpty())
+    {
+        int chosenIndex = occupiedList.indexOf(selectedItem);
+        int spotId = spotIndices[chosenIndex];
+
+        unsigned long checkIn = currentFloor.parkinglots[spotId].CheckInTime;
+        unsigned long durationSeconds = structures.CalculateCharges(checkIn);
+        QString reg = QString::fromStdString(currentFloor.parkinglots[spotId].OVehicleReg);
+
+        QMessageBox::information(
+            this,
+            "Checkout Receipt",
+            QString("Checkout Summary:\n\nVehicle: %1\nSpot: %2\nDuration: %3 seconds\n\nTotal Charges: KES %4\n\nVehicle checked out successfully. Spot is now free.")
+                .arg(reg)
+                .arg(spotId + 1)
+                .arg(durationSeconds)
+                .arg(durationSeconds)
+        );
+
+        structures.FreeSpace(0, spotId);
+        qDebug() << "[EXIT] Spot" << (spotId + 1) << "freed for vehicle" << reg << "after" << durationSeconds << "seconds.";
+    }
 }
 
 void MainWindow::onSpotSelected(int spotId)

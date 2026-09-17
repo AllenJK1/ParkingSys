@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
-#include "../include/structures.hpp"
+#include "structures.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
