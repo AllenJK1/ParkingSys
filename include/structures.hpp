@@ -95,13 +95,79 @@ public:
         return 0;
     }
 
-    unsigned long CalculateCharges(unsigned long checkInTime)
+    unsigned long CalculateDuration(unsigned long checkInTime)
     {
         unsigned long now = static_cast<unsigned long>(std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()).count());
         if (now > checkInTime)
         {
             return now - checkInTime;
+        }
+        return 0;
+    }
+
+    unsigned long GetDuration(unsigned long checkInTime)
+    {
+        return CalculateDuration(checkInTime);
+    }
+
+    std::string FormatDuration(unsigned long total_stay_time)
+    {
+        unsigned long hours = total_stay_time / (60 * 60);
+        unsigned long minutes = (total_stay_time % (60 * 60)) / 60;
+        unsigned long seconds = total_stay_time % 60;
+
+        std::string result;
+        if (hours > 0)
+        {
+            result += std::to_string(hours) + (hours == 1 ? " hour" : " hours");
+        }
+        if (minutes > 0)
+        {
+            if (!result.empty())
+            {
+                result += " ";
+            }
+            result += std::to_string(minutes) + (minutes == 1 ? " minute" : " minutes");
+        }
+        if (seconds > 0 || result.empty())
+        {
+            if (!result.empty())
+            {
+                result += " ";
+            }
+            result += std::to_string(seconds) + (seconds == 1 ? " second" : " seconds");
+        }
+        return result;
+    }
+
+    std::string GetDurationNatural(unsigned long checkInTime)
+    {
+        return FormatDuration(CalculateDuration(checkInTime));
+    }
+
+    unsigned long CalculateCharges(unsigned long checkInTime)
+    {
+        unsigned long total_stay_time = CalculateDuration(checkInTime);
+        if (total_stay_time <= (30 * 60))
+        {
+            return 0;
+        }
+        if ((total_stay_time > (30 * 60)) && (total_stay_time <= (2 * 60 * 60)))
+        {
+            return 50;
+        }
+        if ((total_stay_time > (2 * 60 * 60)) && (total_stay_time <= (4 * 60 * 60)))
+        {
+            return 100;
+        }
+        if ((total_stay_time > (4 * 60 * 60)) && (total_stay_time <= (6 * 60 * 60)))
+        {
+            return 300;
+        }
+        else 
+        {
+            return 500;
         }
         return 0;
     }

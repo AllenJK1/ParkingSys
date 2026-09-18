@@ -174,21 +174,22 @@ void MainWindow::on_exitButton_clicked()
         int spotId = spotIndices[chosenIndex];
 
         unsigned long checkIn = currentFloor.parkinglots[spotId].CheckInTime;
-        unsigned long durationSeconds = structures.CalculateCharges(checkIn);
+        unsigned long charges = structures.CalculateCharges(checkIn);
+        std::string naturalDuration = structures.GetDurationNatural(checkIn);
         QString reg = QString::fromStdString(currentFloor.parkinglots[spotId].OVehicleReg);
 
         QMessageBox::information(
             this,
             "Checkout Receipt",
-            QString("Checkout Summary:\n\nVehicle: %1\nSpot: %2\nDuration: %3 seconds\n\nTotal Charges: KES %4\n\nVehicle checked out successfully. Spot is now free.")
+            QString("Checkout Summary:\n\nVehicle: %1\nSpot: %2\nDuration: %3\n\nTotal Charges: KES %4\n\nVehicle checked out successfully. Spot is now free.")
                 .arg(reg)
                 .arg(spotId + 1)
-                .arg(durationSeconds)
-                .arg(durationSeconds)
+                .arg(QString::fromStdString(naturalDuration))
+                .arg(charges)
         );
 
         structures.FreeSpace(0, spotId);
-        qDebug() << "[EXIT] Spot" << (spotId + 1) << "freed for vehicle" << reg << "after" << durationSeconds << "seconds.";
+        qDebug() << "[EXIT] Spot" << (spotId + 1) << "freed for vehicle" << reg << "after" << QString::fromStdString(naturalDuration) << "charges: KES" << charges;
     }
 }
 
