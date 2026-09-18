@@ -2,8 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QApplication>
+#include <QDialog>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QDebug>
 #include <QString>
+#include <QStringList>
+#include <QList>
 #include "../include/structures.hpp"
+#include "./ui_mainwindow.h"
+#include "./ui_CustomerInfo.h"
+#include "./ui_ReserveParking.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

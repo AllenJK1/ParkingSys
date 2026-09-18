@@ -1,14 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "ui_CustomerInfo.h"
-#include "ui_ReserveParking.h"
-#include <QDialog>
-#include <QDebug>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QStringList>
-#include <QList>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
