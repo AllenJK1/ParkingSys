@@ -173,9 +173,11 @@ void MainWindow::on_exitButton_clicked()
         false,
         &ok
     );
+    // Doalog for exiting vehicles
 
     if (ok && !selectedItem.isEmpty())
     {
+        // Logic for exiting parking lot to calculate charges  duration and also declare the space to be free
         int chosenIndex = occupiedList.indexOf(selectedItem);
         int spotId = spotIndices[chosenIndex];
 
@@ -201,19 +203,19 @@ void MainWindow::on_exitButton_clicked()
 
 void MainWindow::onSpotSelected(int spotId)
 {
-    qDebug() << "[ACTION] User picked Spot:" << (spotId + 1);
+    qDebug() << "User picked Spot:" << (spotId + 1); // Debug message to console ( plus 1 since the indexes start at 0 )
 }
 
 void MainWindow::onOccupiedSpotClicked(int spotId, const QString &vehicleReg)
 {
-    qDebug() << "[ACTION] Clicked occupied Spot:" << (spotId + 1) << "Occupant:" << vehicleReg;
+    qDebug() << "Clicked occupied Spot:" << (spotId + 1) << "Occupant:" << vehicleReg; // Debug message when one selects a parking spot ....
     QMessageBox::information(
         this,
         "Spot Already Occupied",
         QString("Spot %1 is currently occupied.\n\nVehicle Registration: %2").arg(spotId + 1).arg(vehicleReg)
-    );
+    ); // Warnign message not to double book a place
 }
-
+// Event for reserving spot and declaring checkin time and all
 void MainWindow::onSpotReservationConfirmed(int spotId, const QString &vehicleReg)
 {
     QString reg = vehicleReg.isEmpty() ? "UNREGISTERED" : vehicleReg;
@@ -233,6 +235,6 @@ void MainWindow::onSpotReservationConfirmed(int spotId, const QString &vehicleRe
             this,
             "Error",
             QString("Could not reserve Spot %1. It may already be occupied.").arg(spotId + 1)
-        );
+        ); // INcase the reservation fails (Hoever this part may not be reached since if occupied it would be already flagged earluer on as the spot is not clickable)
     }
 }
