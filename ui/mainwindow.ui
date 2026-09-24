@@ -6,21 +6,70 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
-    <height>516</height>
+    <width>640</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Parking System</string>
+   <string>Parking Management System</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>15</number>
+    </property>
+    <property name="leftMargin">
+     <number>30</number>
+    </property>
+    <property name="topMargin">
+     <number>25</number>
+    </property>
+    <property name="rightMargin">
+     <number>30</number>
+    </property>
+    <property name="bottomMargin">
+     <number>25</number>
+    </property>
+    <item alignment="Qt::AlignCenter">
+     <widget class="QLabel" name="titleLabel">
+      <property name="font">
+       <font>
+        <pointsize>16</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>PARKING MANAGEMENT SYSTEM</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item alignment="Qt::AlignCenter">
+     <widget class="QLabel" name="statusLabel">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string>color: #333333; padding: 6px; background-color: #f0f0f0; border-radius: 4px;</string>
+      </property>
+      <property name="text">
+       <string>System Ready</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
     <item alignment="Qt::AlignCenter">
      <widget class="QPushButton" name="reserveButton">
       <property name="minimumSize">
        <size>
-        <width>220</width>
-        <height>50</height>
+        <width>260</width>
+        <height>46</height>
        </size>
       </property>
       <property name="font">
@@ -38,8 +87,8 @@
      <widget class="QPushButton" name="exitButton">
       <property name="minimumSize">
        <size>
-        <width>220</width>
-        <height>50</height>
+        <width>260</width>
+        <height>46</height>
        </size>
       </property>
       <property name="font">
@@ -49,7 +98,45 @@
        </font>
       </property>
       <property name="text">
-       <string>Exit</string>
+       <string>Exit / Checkout</string>
+      </property>
+     </widget>
+    </item>
+    <item alignment="Qt::AlignCenter">
+     <widget class="QPushButton" name="manageParkingButton">
+      <property name="minimumSize">
+       <size>
+        <width>260</width>
+        <height>46</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Manage Floors &amp; Lots</string>
+      </property>
+     </widget>
+    </item>
+    <item alignment="Qt::AlignCenter">
+     <widget class="QPushButton" name="ratesButton">
+      <property name="minimumSize">
+       <size>
+        <width>260</width>
+        <height>46</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tariff &amp; Rates Settings</string>
       </property>
      </widget>
     </item>
@@ -60,12 +147,42 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>629</width>
+     <width>640</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuManage">
+    <property name="title">
+     <string>Manage</string>
+    </property>
+    <addaction name="actionManageFloorsLots"/>
+    <addaction name="actionRates"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionExit"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuManage"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionManageFloorsLots">
+   <property name="text">
+    <string>Manage Floors &amp; Lots</string>
+   </property>
+  </action>
+  <action name="actionRates">
+   <property name="text">
+    <string>Tariff &amp; Rates Settings</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit Application</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

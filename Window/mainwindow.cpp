@@ -5,11 +5,40 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(ui->actionManageFloorsLots, &QAction::triggered, this, &MainWindow::on_actionManageFloorsLots_triggered);
+    connect(ui->actionRates, &QAction::triggered, this, &MainWindow::on_actionRates_triggered);
+    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
+
+    updateDashboardStatus();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateDashboardStatus()
+{
+    unsigned long totalSpots = 0;
+    unsigned long occupiedSpots = 0;
+    unsigned long floorCount = structures.GetFloorCount();
+
+    for (unsigned long f = 0; f < floorCount; ++f)
+    {
+        Floor fl = structures.GetFloors(f);
+        totalSpots += fl.parkinglots.size();
+        for (const auto &lot : fl.parkinglots)
+        {
+            if (lot.occupied) occupiedSpots++;
+        }
+    }
+    unsigned long freeSpots = (totalSpots >= occupiedSpots) ? (totalSpots - occupiedSpots) : 0;
+    ui->statusLabel->setText(QString("Floors: %1  |  Total Spots: %2  |  Available: %3  |  Occupied: %4")
+        .arg(floorCount)
+        .arg(totalSpots)
+        .arg(freeSpots)
+        .arg(occupiedSpots));
 }
 
 bool MainWindow::promptCustomerInfo()
@@ -20,20 +49,22 @@ bool MainWindow::promptCustomerInfo()
 
     if (dialog.exec() == QDialog::Accepted) {
         QString FirstName = customerUi.textEdit->toPlainText().trimmed();
-        QString SecondName = customerUi.textEdit_2->toPlainText().trimmed();
-        QString VehicleReg = customerUi.textEdit_3->toPlainText().trimmed();
+        QString SecondName = customerUi.textEdit_3->toPlainText().trimmed();
+        QString VehicleReg = customerUi.textEdit_2->toPlainText().trimmed();
         QString IdNumber = customerUi.textEdit_4->toPlainText().trimmed();
+        QString PhoneNumber = customerUi.textEdit_5->toPlainText().trimmed();
 
         if (VehicleReg.isEmpty()) {
             QMessageBox::warning(this, "Missing Information", "Please enter at least the Vehicle Registration number.");
             return false;
         }
 
-        currentCustomerId = structures.AddCustomer(FirstName.toStdString(), SecondName.toStdString(), IdNumber.toStdString());
+        currentCustomerId = structures.AddCustomer(FirstName.toStdString(), SecondName.toStdString(), IdNumber.toStdString(), PhoneNumber.toStdString());
         currentVehicleReg = VehicleReg;
         currentCustomerName = (FirstName.isEmpty() && SecondName.isEmpty()) ? "Customer" : (FirstName + " " + SecondName);
+        currentCustomerPhone = PhoneNumber;
 
-        qDebug() << "Customer registered:" << currentCustomerName << "Vehicle:" << currentVehicleReg;
+        qDebug() << "Customer registered:" << currentCustomerName << "Vehicle:" << currentVehicleReg << "Phone:" << currentCustomerPhone;
         return true;
     }
     return false;
@@ -41,139 +72,50 @@ bool MainWindow::promptCustomerInfo()
 
 void MainWindow::on_reserveButton_clicked()
 {
-    QDialog dialog(this);
-    Ui::ReserveParkingDialog ParkingUi;
-    ParkingUi.setupUi(&dialog);
-
-    int selectedSpot = -1;
-    QPushButton *lastSelectedBtn = nullptr;
-
-    Floor currentFloor = structures.GetFloors(0);
-
-    for (int row = 0; row < 6; ++row)
-    {
-        for (int col = 0; col < 2; ++col)
-        {
-            int spotId = row * 2 + col;
-
-            QPushButton *spotBtn = new QPushButton(&dialog);
-            spotBtn->setMinimumSize(85, 38);
-
-            bool isOccupied = currentFloor.parkinglots[spotId].occupied;
-            QString regNumber = QString::fromStdString(currentFloor.parkinglots[spotId].OVehicleReg);
-
-            if (isOccupied)
-            {
-                spotBtn->setText(QString("Spot %1\n%2").arg(spotId + 1).arg(regNumber));
-                spotBtn->setStyleSheet(
-                    "background-color: #c62828; color: white; font-weight: bold; "
-                    "border-radius: 5px; font-size: 10px;"
-                );
-
-                QObject::connect(spotBtn, &QPushButton::clicked, [this, spotId, regNumber]() {
-                    this->onOccupiedSpotClicked(spotId, regNumber);
-                });
-            }
-            else
-            {
-                spotBtn->setText(QString("Spot %1\n[ FREE ]").arg(spotId + 1));
-                spotBtn->setStyleSheet(
-                    "background-color: #2e7d32; color: white; font-weight: bold; "
-                    "border-radius: 5px; font-size: 10px;"
-                );
-
-                QObject::connect(spotBtn, &QPushButton::clicked, [this, &selectedSpot, &lastSelectedBtn, spotBtn, spotId]() {
-                    if (lastSelectedBtn && lastSelectedBtn != spotBtn) {
-                        lastSelectedBtn->setStyleSheet(
-                            "background-color: #2e7d32; color: white; font-weight: bold; "
-                            "border-radius: 5px; font-size: 10px;"
-                        );
-                    }
-
-                    selectedSpot = spotId;
-                    lastSelectedBtn = spotBtn;
-                    spotBtn->setStyleSheet(
-                        "background-color: #1565c0; color: white; font-weight: bold; "
-                        "border-radius: 5px; font-size: 10px; border: 2px solid yellow;"
-                    );
-
-                    this->onSpotSelected(spotId);
-                });
-            }
-
-            ParkingUi.gridLayout->addWidget(spotBtn, row, col);
-        }
-    }
-
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        if (selectedSpot != -1) {
-            if (currentVehicleReg.isEmpty()) {
-                QMessageBox::information(
-                    this,
-                    "Customer Details Required",
-                    QString("You selected Spot %1.\n\nPlease enter the customer and vehicle registration details to complete this reservation.").arg(selectedSpot + 1)
-                );
-
-                if (!promptCustomerInfo()) {
-                    qDebug() << "Reservation aborted: User cancelled customer details dialog.";
-                    return;
-                }
-            }
-
-            this->onSpotReservationConfirmed(selectedSpot, currentVehicleReg);
-
-            currentVehicleReg.clear();
-            currentCustomerName.clear();
-        } else {
-            QMessageBox::warning(this, "No Spot Selected", "Please select an available parking spot before clicking OK.");
-        }
-    }
-    else
-    {
-        qDebug() << "Reservation Dialog Cancelled";
-    }
+    qDebug() << "Reserve spot clicked";
 }
 
 void MainWindow::on_exitButton_clicked()
 {
-    qDebug() << "Exit / Checkout clicked";
+    qDebug() << "Exit clicked";
 }
 
-void MainWindow::onSpotSelected(int spotId)
+void MainWindow::on_manageParkingButton_clicked()
 {
-    qDebug() << "[ACTION] User picked Spot:" << (spotId + 1);
+    qDebug() << "Manage parking clicked";
 }
 
-void MainWindow::onOccupiedSpotClicked(int spotId, const QString &vehicleReg)
+void MainWindow::on_ratesButton_clicked()
 {
-    qDebug() << "[ACTION] Clicked occupied Spot:" << (spotId + 1) << "Occupant:" << vehicleReg;
-    QMessageBox::information(
-        this,
-        "Spot Already Occupied",
-        QString("Spot %1 is currently occupied.\n\nVehicle Registration: %2").arg(spotId + 1).arg(vehicleReg)
-    );
+    qDebug() << "Rates clicked";
 }
 
-void MainWindow::onSpotReservationConfirmed(int spotId, const QString &vehicleReg)
+void MainWindow::on_actionManageFloorsLots_triggered()
 {
-    QString reg = vehicleReg.isEmpty() ? "UNREGISTERED" : vehicleReg;
+    on_manageParkingButton_clicked();
+}
 
-    int result = structures.SelectSpace(reg.toStdString(), 0, spotId, currentCustomerId);
+void MainWindow::on_actionRates_triggered()
+{
+    on_ratesButton_clicked();
+}
 
-    if (result == 0) {
-        qDebug() << "[SUCCESS] Spot" << (spotId + 1) << "assigned to vehicle:" << reg;
-        QMessageBox::information(
-            this,
-            "Reservation Confirmed",
-            QString("Spot %1 has been successfully reserved for vehicle:\n%2").arg(spotId + 1).arg(reg)
-        );
-    } else {
-        qDebug() << "[ERROR] Could not reserve Spot" << (spotId + 1);
-        QMessageBox::critical(
-            this,
-            "Error",
-            QString("Could not reserve Spot %1. It may already be occupied.").arg(spotId + 1)
-        );
-    }
+void MainWindow::on_actionExit_triggered()
+{
+    QApplication::quit();
+}
+
+void MainWindow::onSpotSelected(unsigned long floorId, int spotId)
+{
+    qDebug() << "User picked Floor:" << (floorId + 1) << "Spot:" << (spotId + 1);
+}
+
+void MainWindow::onOccupiedSpotClicked(unsigned long floorId, int spotId, const QString &vehicleReg)
+{
+    qDebug() << "Clicked occupied Floor:" << (floorId + 1) << "Spot:" << (spotId + 1) << "Occupant:" << vehicleReg;
+}
+
+void MainWindow::onSpotReservationConfirmed(unsigned long floorId, int spotId, const QString &vehicleReg)
+{
+    qDebug() << "Confirmed Floor:" << (floorId + 1) << "Spot:" << (spotId + 1) << "Vehicle:" << vehicleReg;
 }
